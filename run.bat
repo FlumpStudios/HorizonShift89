@@ -1,0 +1,3 @@
+@echo off
+echo Launching Horizon Shift 89 in Emulicious...
+start "" "C:\Projects\GB\Emulicious\Emulicious.exe" "C:\Projects\GB\HorizonShift89\build\HorizonShift89.gb"

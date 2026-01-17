@@ -5,10 +5,7 @@
             "label": "Build ROM",
             "type": "shell",
             "command": "${workspaceFolder}/build.bat",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "group": "build",
             "problemMatcher": {
                 "pattern": {
                     "regexp": "^(.*):(\\d+):\\s+(warning|error)\\s+(\\d+):\\s+(.*)$",
@@ -28,7 +25,10 @@
             "label": "Build and Run",
             "type": "shell",
             "command": "${workspaceFolder}/build-and-run.bat",
-            "group": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "presentation": {
                 "reveal": "always",
                 "panel": "shared"

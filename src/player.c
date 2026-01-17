@@ -23,7 +23,8 @@ void init_player(void) {
     player.last_lr_time = 0;
     player.last_lr_dir = 0;
 
-    move_sprite(player.sprite_id, player.x + 8, CENTER_LINE_Y + 16);
+    // Position with facing offset (starts facing up, so -3)
+    move_sprite(player.sprite_id, player.x + 8, CENTER_LINE_Y - 3 + 16);
     set_sprite_tile(player.sprite_id, 0);
 }
 
@@ -189,5 +190,7 @@ void player_shoot(void) {
 
 void render_player(void) {
     // Position sprite with y_offset for jumping
-    move_sprite(player.sprite_id, player.x + 8, CENTER_LINE_Y + player.y_offset + 16);
+    // Offset based on facing so player sits on the line
+    int8_t facing_offset = (player.facing == DIR_UP) ? -3 : 2;
+    move_sprite(player.sprite_id, player.x + 8, CENTER_LINE_Y + player.y_offset + facing_offset + 16);
 }

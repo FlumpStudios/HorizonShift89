@@ -29,9 +29,9 @@ Area                       Addr        Size        Decimal Bytes (Attributes)
      00000007  l__INITIA |    00000008  l__HEADER |    0000000C  l__GSINIT
      00000013  l__HRAM   |    00000030  l__HEADER |    00000060  l__HEADER
      000000AB  l__HEADER |    000000B3  l__DATA   |    00000200  s__CODE  
-     00000887  l__HOME   |    000014A0  l__CODE   |    000016A0  s__HOME  
-     00001F27  s__BASE   |    00001F27  s__CODE_0 |    00001F27  s__INITIA
-     00001F27  s__LIT    |    00001F2E  s__GSINIT |    00001F3A  s__GSFINA
+     00000887  l__HOME   |    000014AD  l__CODE   |    000016AD  s__HOME  
+     00001F34  s__BASE   |    00001F34  s__CODE_0 |    00001F34  s__INITIA
+     00001F34  s__LIT    |    00001F3B  s__GSINIT |    00001F47  s__GSFINA
      00002000  _rROMB0   |    00003000  _rROMB1   |    00004000  _rMBC7_SR
      00004000  _rRAMB    |    00008000  __VRAM    |    00008000  __VRAM800
      00008800  __VRAM880 |    00009000  __VRAM900 |    00009800  __SCRN0  
@@ -76,7 +76,7 @@ Hexadecimal  [32-Bits]
 
 Area                       Addr        Size        Decimal Bytes (Attributes)
 --------------------       ----        ----        ------- ----- ------------
-_CODE                  00000200    000014A0 =        5280. bytes (REL,CON)
+_CODE                  00000200    000014AD =        5293. bytes (REL,CON)
 
         Value  Global            Value  Global            Value  Global    
         -----  ------            -----  ------            -----  ------    
@@ -84,19 +84,19 @@ _CODE                  00000200    000014A0 =        5280. bytes (REL,CON)
      0000036B  _init_gam |    000003B1  _update_g |    0000041C  _render_g
      00000425  _main     |    00000497  _init_pla |    00000502  _player_j
      0000051B  _player_d |    00000537  _update_p |    000007B7  _player_s
-     000007F4  _render_p |    00000810  _init_ene |    00000844  _spawn_en
-     00000A26  _update_e |    00000BA9  _render_e |    00000C49  _init_bul
-     00000C7C  _fire_bul |    00000D42  _update_b |    00000E3B  _render_b
-     00000EDB  _check_co |    00000FCD  _check_co |    0000116B  _draw_cen
-     00001191  _update_h |    000011ED  __divsuch |    000011F3  __modsuch
-     000011FC  __divusch |    00001205  __modusch |    00001211  __divscha
-     00001216  __modscha |    0000121D  __divsint |    00001226  __modsint
-     00001232  __divucha |    00001237  __moducha |    0000123E  __divuint
-     00001247  __moduint |    00001253  .div8     |    00001253  .mod8    
-     0000125B  .div16    |    0000125B  .mod16    |    00001291  .divu8   
-     00001291  .modu8    |    00001294  .divu16   |    00001294  .modu16  
-     000012D4  _printf   |    000012E9  ___crlf   |    00001324  ___printf
-     00001681  _sprintf 
+     000007F4  _render_p |    0000081D  _init_ene |    00000851  _spawn_en
+     00000A33  _update_e |    00000BB6  _render_e |    00000C56  _init_bul
+     00000C89  _fire_bul |    00000D4F  _update_b |    00000E48  _render_b
+     00000EE8  _check_co |    00000FDA  _check_co |    00001178  _draw_cen
+     0000119E  _update_h |    000011FA  __divsuch |    00001200  __modsuch
+     00001209  __divusch |    00001212  __modusch |    0000121E  __divscha
+     00001223  __modscha |    0000122A  __divsint |    00001233  __modsint
+     0000123F  __divucha |    00001244  __moducha |    0000124B  __divuint
+     00001254  __moduint |    00001260  .div8     |    00001260  .mod8    
+     00001268  .div16    |    00001268  .mod16    |    0000129E  .divu8   
+     0000129E  .modu8    |    000012A1  .divu16   |    000012A1  .modu16  
+     000012E1  _printf   |    000012F6  ___crlf   |    00001331  ___printf
+     0000168E  _sprintf 
 ASxxxx Linker V03.00/V05.40 + sdld,  page 4.
 Hexadecimal  [32-Bits]
 
@@ -274,35 +274,35 @@ Hexadecimal  [32-Bits]
 
 Area                       Addr        Size        Decimal Bytes (Attributes)
 --------------------       ----        ----        ------- ----- ------------
-_HOME                  000016A0    00000887 =        2183. bytes (REL,CON)
+_HOME                  000016AD    00000887 =        2183. bytes (REL,CON)
 
         Value  Global            Value  Global            Value  Global    
         -----  ------            -----  ------            -----  ------    
-     000016A0  .memset_s |    000016A9  .memcpy_s |    000016C6  .display_
-     000016C6  _display_ |    000016DE  _rand     |    000016DE  _randw   
-     00001709  _initrand |    0000170B  .initrand |    00001714  _font_loa
-     0000171B  font_load |    00001763  font_copy |    00001799  font_set 
-     000017A6  .put_char |    000017BE  .out_char |    000017C4  .del_char
-     0000181A  _putchar  |    00001823  _setchar  |    0000182C  _font_loa
-     0000183A  _font_set |    00001849  _font_ini |    00001868  .cls     
-     00001868  _cls      |    0000188A  _gotoxy   |    00001895  _posx    
-     000018A6  _posy     |    000018CE  .cr_curs  |    000018E3  .adv_curs
-     0000193F  .tmode    |    0000195C  .tmode_ou |    00001965  .padup   
-     00001965  _waitpadu |    00001975  .jpad     |    00001975  _joypad  
-     0000199D  _waitpad  |    0000199E  .wait_pad |    000019A5  _set_tile
-     000019AA  _set_bkg_ |    000019AA  _set_win_ |    000019B2  _set_spri
-     000019E2  _color    |    000019E2  _set_1bpp |    000019F1  _puts    
-     00001A16  .drawing_ |    00001A33  _font_ibm |    00001E14  .add_LCD 
-     00001E14  _add_LCD  |    00001E1A  .remove_L |    00001E1A  _remove_L
-     00001E20  _set_bkg_ |    00001E20  _set_win_ |    00001E28  _set_spri
-     00001E80  _uitoa    |    00001E8F  _itoa     |    00001E9E  .itoa    
-     00001EB2  .utoa     |    00001F26  ___sdcc_c
+     000016AD  .memset_s |    000016B6  .memcpy_s |    000016D3  .display_
+     000016D3  _display_ |    000016EB  _rand     |    000016EB  _randw   
+     00001716  _initrand |    00001718  .initrand |    00001721  _font_loa
+     00001728  font_load |    00001770  font_copy |    000017A6  font_set 
+     000017B3  .put_char |    000017CB  .out_char |    000017D1  .del_char
+     00001827  _putchar  |    00001830  _setchar  |    00001839  _font_loa
+     00001847  _font_set |    00001856  _font_ini |    00001875  .cls     
+     00001875  _cls      |    00001897  _gotoxy   |    000018A2  _posx    
+     000018B3  _posy     |    000018DB  .cr_curs  |    000018F0  .adv_curs
+     0000194C  .tmode    |    00001969  .tmode_ou |    00001972  .padup   
+     00001972  _waitpadu |    00001982  .jpad     |    00001982  _joypad  
+     000019AA  _waitpad  |    000019AB  .wait_pad |    000019B2  _set_tile
+     000019B7  _set_bkg_ |    000019B7  _set_win_ |    000019BF  _set_spri
+     000019EF  _color    |    000019EF  _set_1bpp |    000019FE  _puts    
+     00001A23  .drawing_ |    00001A40  _font_ibm |    00001E21  .add_LCD 
+     00001E21  _add_LCD  |    00001E27  .remove_L |    00001E27  _remove_L
+     00001E2D  _set_bkg_ |    00001E2D  _set_win_ |    00001E35  _set_spri
+     00001E8D  _uitoa    |    00001E9C  _itoa     |    00001EAB  .itoa    
+     00001EBF  .utoa     |    00001F33  ___sdcc_c
 ASxxxx Linker V03.00/V05.40 + sdld,  page 23.
 Hexadecimal  [32-Bits]
 
 Area                       Addr        Size        Decimal Bytes (Attributes)
 --------------------       ----        ----        ------- ----- ------------
-_INITIALIZER           00001F27    00000007 =           7. bytes (REL,CON)
+_INITIALIZER           00001F34    00000007 =           7. bytes (REL,CON)
 
         Value  Global            Value  Global            Value  Global    
         -----  ------            -----  ------            -----  ------    
@@ -311,17 +311,17 @@ Hexadecimal  [32-Bits]
 
 Area                       Addr        Size        Decimal Bytes (Attributes)
 --------------------       ----        ----        ------- ----- ------------
-_GSINIT                00001F2E    0000000C =          12. bytes (REL,CON)
+_GSINIT                00001F3B    0000000C =          12. bytes (REL,CON)
 
         Value  Global            Value  Global            Value  Global    
         -----  ------            -----  ------            -----  ------    
-     00001F2E  gsinit   
+     00001F3B  gsinit   
 ASxxxx Linker V03.00/V05.40 + sdld,  page 25.
 Hexadecimal  [32-Bits]
 
 Area                       Addr        Size        Decimal Bytes (Attributes)
 --------------------       ----        ----        ------- ----- ------------
-_GSFINAL               00001F3A    00000001 =           1. bytes (REL,CON)
+_GSFINAL               00001F47    00000001 =           1. bytes (REL,CON)
 
         Value  Global            Value  Global            Value  Global    
         -----  ------            -----  ------            -----  ------    
@@ -386,17 +386,17 @@ _HEADER_LCD0           00000000    00000003 =           3. bytes (ABS,CON)
 Files Linked                              [ module(s) ]
 
 C:\Projects\GB\gbdk\lib/gb/crt0.o         [ Runtime ]
-C:\Users\flump\AppData\Local\Temp/lcc542080.o
+C:\Users\flump\AppData\Local\Temp/lcc565840.o
                                           [ main ]
-C:\Users\flump\AppData\Local\Temp/lcc542081.o
+C:\Users\flump\AppData\Local\Temp/lcc565841.o
                                           [ player ]
-C:\Users\flump\AppData\Local\Temp/lcc542082.o
+C:\Users\flump\AppData\Local\Temp/lcc565842.o
                                           [ enemy ]
-C:\Users\flump\AppData\Local\Temp/lcc542083.o
+C:\Users\flump\AppData\Local\Temp/lcc565843.o
                                           [ bullet ]
-C:\Users\flump\AppData\Local\Temp/lcc542084.o
+C:\Users\flump\AppData\Local\Temp/lcc565844.o
                                           [ collision ]
-C:\Users\flump\AppData\Local\Temp/lcc542085.o
+C:\Users\flump\AppData\Local\Temp/lcc565845.o
                                           [ utils ]
 
 

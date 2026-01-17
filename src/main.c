@@ -30,11 +30,11 @@ void show_title(void) {
     printf("\n");
     printf("   LEFT/RIGHT: Move\n");
     printf("   UP/DOWN: Aim\n");
-    printf("   A: Shoot\n");
+    printf("   A: Jump\n");
+    printf("   B: Shoot\n");
+    printf("   Double-tap: Dash\n");
     printf("\n");
     printf("   Defend the line!\n");
-    printf("   Enemies attack from\n");
-    printf("   above AND below.\n");
     printf("\n\n");
     printf("   Press START");
 

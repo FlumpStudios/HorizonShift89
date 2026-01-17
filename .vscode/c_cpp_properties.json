@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "GBDK-2020",
+            "includePath": [
+                "${workspaceFolder}/include",
+                "C:/Projects/GB/gbdk/include",
+                "C:/Projects/GB/gbdk/include/gb"
+            ],
+            "defines": [
+                "__PORT_sm83",
+                "__TARGET_gb"
+            ],
+            "compilerPath": "",
+            "cStandard": "c99",
+            "intelliSenseMode": "gcc-x86"
+        }
+    ],
+    "version": 4
+}

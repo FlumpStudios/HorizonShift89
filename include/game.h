@@ -17,6 +17,17 @@
 #define ENEMY_SPEED_MIN     1
 #define ENEMY_SPEED_MAX     2
 
+// --- Jump Constants ---
+#define JUMP_VELOCITY       6
+#define GRAVITY             1
+#define MAX_JUMP_HEIGHT     32
+
+// --- Dash Constants ---
+#define DASH_SPEED          8
+#define DASH_DURATION       8
+#define DASH_COOLDOWN       20
+#define DOUBLE_TAP_WINDOW   12
+
 // --- Sprite Constants ---
 #define SPRITE_PLAYER       0
 #define SPRITE_BULLET_START 1
@@ -50,9 +61,18 @@ typedef struct {
 // --- Player Structure ---
 typedef struct {
     int16_t x;              // X position on center line
+    int8_t y_offset;        // Y offset from center line (for jumping)
+    int8_t vy;              // Vertical velocity
     Direction facing;       // UP or DOWN
     uint8_t sprite_id;
     uint8_t shoot_cooldown; // Frames until can shoot again
+    uint8_t is_jumping;     // Currently in a jump?
+    uint8_t is_dashing;     // Currently dashing?
+    int8_t dash_dir;        // Dash direction (-1 left, +1 right)
+    uint8_t dash_timer;     // Frames remaining in dash
+    uint8_t dash_cooldown;  // Frames until can dash again
+    uint8_t last_lr_time;   // Frame counter for double-tap detection
+    uint8_t last_lr_dir;    // Last L/R direction pressed (for double-tap)
 } Player;
 
 // --- Global Game State ---
@@ -76,7 +96,8 @@ void init_player(void);
 void update_player(void);
 void render_player(void);
 void player_shoot(void);
-void player_flip(void);
+void player_jump(void);
+void player_dash(int8_t dir);
 
 // enemy.c
 void init_enemies(void);

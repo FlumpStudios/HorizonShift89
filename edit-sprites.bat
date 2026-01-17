@@ -1,0 +1,3 @@
+@echo off
+echo Opening GBTD Sprite Editor...
+start "" "C:\Projects\GB\GBTD_GBMB\GBTD\gbtd.exe"

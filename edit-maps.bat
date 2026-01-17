@@ -1,0 +1,3 @@
+@echo off
+echo Opening GBMB Map Builder...
+start "" "C:\Projects\GB\GBTD_GBMB\GBMB\gbmb.exe"

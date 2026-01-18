@@ -12,10 +12,16 @@
 // --- Game Constants ---
 #define MAX_ENEMIES         8
 #define MAX_BULLETS         4
+#define MAX_ENEMY_BULLETS   4
 #define PLAYER_SPEED        2
 #define BULLET_SPEED        4
+#define ENEMY_BULLET_SPEED  3
 #define ENEMY_SPEED_MIN     1
 #define ENEMY_SPEED_MAX     2
+#define SHOOTER_SPEED       1
+#define SHOOTER_FIRE_RATE   90  // Frames between shots
+#define ZIGZAG_SPEED        2   // Horizontal oscillation speed
+#define ZIGZAG_FLIP_RATE    20  // Frames between direction flips
 
 // --- Jump Constants ---
 #define JUMP_VELOCITY       6
@@ -32,12 +38,29 @@
 #define SPRITE_PLAYER       0
 #define SPRITE_BULLET_START 1
 #define SPRITE_ENEMY_START  5       // Sprites 5-12 for enemies
+#define SPRITE_ENEMY_BULLET_START 13  // Sprites 13-16 for enemy bullets
+
+// --- Tile Constants ---
+#define TILE_PLAYER_UP      0
+#define TILE_PLAYER_DOWN    1
+#define TILE_ENEMY          2
+#define TILE_BULLET         3
+#define TILE_SHOOTER        4
+#define TILE_ENEMY_BULLET   5
+#define TILE_ZIGZAG         6
 
 // --- Direction ---
 typedef enum {
     DIR_UP = 0,
     DIR_DOWN = 1
 } Direction;
+
+// --- Enemy Types ---
+typedef enum {
+    ENEMY_NORMAL = 0,
+    ENEMY_SHOOTER = 1,
+    ENEMY_ZIGZAG = 2
+} EnemyType;
 
 // --- Game States ---
 typedef enum {
@@ -56,6 +79,8 @@ typedef struct {
     uint8_t active;     // Is entity active?
     uint8_t sprite_id;  // Hardware sprite index
     Direction dir;      // Direction facing (for enemies: which side they come from)
+    uint8_t type;       // EnemyType (for enemies only)
+    uint8_t shoot_timer; // Frames until next shot (for shooter enemies)
 } Entity;
 
 // --- Player Structure ---
@@ -80,6 +105,7 @@ extern GameState game_state;
 extern Player player;
 extern Entity enemies[MAX_ENEMIES];
 extern Entity bullets[MAX_BULLETS];
+extern Entity enemy_bullets[MAX_ENEMY_BULLETS];
 extern uint16_t score;
 extern uint8_t lives;
 extern uint8_t level;
@@ -110,6 +136,12 @@ void init_bullets(void);
 void update_bullets(void);
 void render_bullets(void);
 void fire_bullet(int16_t x, int16_t y, Direction dir);
+
+// enemy_bullet.c
+void init_enemy_bullets(void);
+void update_enemy_bullets(void);
+void render_enemy_bullets(void);
+void fire_enemy_bullet(uint16_t x, uint16_t y, Direction dir);
 
 // collision.c
 void check_collisions(void);

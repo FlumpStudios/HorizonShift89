@@ -8,8 +8,11 @@
 
 // Tile 0: Player facing UP (arrow/ship pointing up)
 // Tile 1: Player facing DOWN (arrow/ship pointing down)
-// Tile 2: Enemy
-// Tile 3: Bullet
+// Tile 2: Enemy (vertical mover)
+// Tile 3: Bullet (player)
+// Tile 4: Shooter enemy (horizontal mover)
+// Tile 5: Enemy bullet
+// Tile 6: Zigzag enemy (wavy mover)
 
 const uint8_t sprite_data[] = {
     // Tile 0: Player facing UP - simple arrow shape
@@ -50,7 +53,37 @@ const uint8_t sprite_data[] = {
     0x3C, 0x3C,  // .XXXX...
     0x18, 0x18,  // ..XX....
     0x18, 0x18,  // ..XX....
-    0x00, 0x00   // ........
+    0x00, 0x00,  // ........
+
+    // Tile 4: Shooter enemy - horizontal ship with wings
+    0x18, 0x18,  // ...XX...
+    0x18, 0x18,  // ...XX...
+    0xDB, 0xDB,  // XX.XX.XX
+    0xFF, 0xFF,  // XXXXXXXX
+    0xFF, 0xFF,  // XXXXXXXX
+    0xDB, 0xDB,  // XX.XX.XX
+    0x18, 0x18,  // ...XX...
+    0x18, 0x18,  // ...XX...
+
+    // Tile 5: Enemy bullet - diamond shape
+    0x00, 0x00,  // ........
+    0x18, 0x18,  // ...XX...
+    0x3C, 0x3C,  // ..XXXX..
+    0x7E, 0x7E,  // .XXXXXX.
+    0x7E, 0x7E,  // .XXXXXX.
+    0x3C, 0x3C,  // ..XXXX..
+    0x18, 0x18,  // ...XX...
+    0x00, 0x00,  // ........
+
+    // Tile 6: Zigzag enemy - serpent/wave shape
+    0x60, 0x60,  // .XX.....
+    0x90, 0x90,  // X..X....
+    0x3C, 0x3C,  // ..XXXX..
+    0x5A, 0x5A,  // .X.XX.X.
+    0x5A, 0x5A,  // .X.XX.X.
+    0x3C, 0x3C,  // ..XXXX..
+    0x09, 0x09,  // ....X..X
+    0x06, 0x06   // .....XX.
 };
 
 #endif

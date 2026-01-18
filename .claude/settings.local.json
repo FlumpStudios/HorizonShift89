@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir C:ProjectsGBHorizonShift89src*.c)",
+      "Bash(del \"C:\\\\Projects\\\\GB\\\\HorizonShift89\\\\src\\\\enemy_bullet.c\")"
+    ]
+  }
+}

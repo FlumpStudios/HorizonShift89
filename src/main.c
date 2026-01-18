@@ -69,9 +69,10 @@ void init_game(void) {
     init_player();
     init_enemies();
     init_bullets();
+    init_enemy_bullets();
 
-    // Load sprite data
-    set_sprite_data(0, 4, sprite_data);
+    // Load sprite data (6 tiles: player up/down, enemy, bullet, shooter, enemy bullet)
+    set_sprite_data(0, 7, sprite_data);
 
     // Enable sprites
     SHOW_SPRITES;
@@ -101,6 +102,7 @@ void update_game(void) {
     update_player();
     update_enemies();
     update_bullets();
+    update_enemy_bullets();
 
     // Check for collisions
     check_collisions();
@@ -121,6 +123,7 @@ void render_game(void) {
     render_player();
     render_enemies();
     render_bullets();
+    render_enemy_bullets();
 }
 
 // --- Main ---

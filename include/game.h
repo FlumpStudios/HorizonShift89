@@ -48,6 +48,10 @@
 #define TILE_SHOOTER        4
 #define TILE_ENEMY_BULLET   5
 #define TILE_ZIGZAG         6
+#define TILE_ASTEROID       7
+
+// --- Center Line Constants ---
+#define CENTER_LINE_TILES   20
 
 // --- Direction ---
 typedef enum {
@@ -59,7 +63,8 @@ typedef enum {
 typedef enum {
     ENEMY_NORMAL = 0,
     ENEMY_SHOOTER = 1,
-    ENEMY_ZIGZAG = 2
+    ENEMY_ZIGZAG = 2,
+    ENEMY_ASTEROID = 3
 } EnemyType;
 
 // --- Game States ---
@@ -110,6 +115,7 @@ extern uint16_t score;
 extern uint8_t lives;
 extern uint8_t level;
 extern uint16_t frame_count;
+extern uint8_t center_line_state[CENTER_LINE_TILES];
 
 // --- Function Prototypes ---
 // main.c
@@ -150,5 +156,8 @@ uint8_t check_collision(Entity* a, Entity* b);
 // utils.c
 void draw_center_line(void);
 void update_hud(void);
+void reset_center_line(void);
+void destroy_center_line_section(uint8_t x, uint8_t radius);
+uint8_t get_center_line_tile_at(uint8_t x);
 
 #endif

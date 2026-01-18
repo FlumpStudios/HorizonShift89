@@ -138,9 +138,16 @@ void update_player(void) {
             player.vy += GRAVITY;
             // Landed back on line?
             if (player.y_offset >= 0) {
-                player.y_offset = 0;
-                player.vy = 0;
-                player.is_jumping = 0;
+                // Check if landing on destroyed section
+                if (get_center_line_tile_at(player.x) == 1) {
+                    // Tile is destroyed - keep falling through!
+                    player.y_offset = 1;  // Start falling below the line
+                    player.vy = GRAVITY;  // Fall downward
+                } else {
+                    player.y_offset = 0;
+                    player.vy = 0;
+                    player.is_jumping = 0;
+                }
             }
             // Cap jump height
             if (player.y_offset < -MAX_JUMP_HEIGHT) {
@@ -150,14 +157,42 @@ void update_player(void) {
             player.vy -= GRAVITY;
             // Landed back on line?
             if (player.y_offset <= 0) {
-                player.y_offset = 0;
-                player.vy = 0;
-                player.is_jumping = 0;
+                // Check if landing on destroyed section
+                if (get_center_line_tile_at(player.x) == 1) {
+                    // Tile is destroyed - keep falling through!
+                    player.y_offset = -1;  // Start falling above the line
+                    player.vy = -GRAVITY;  // Fall upward
+                } else {
+                    player.y_offset = 0;
+                    player.vy = 0;
+                    player.is_jumping = 0;
+                }
             }
             // Cap jump height
             if (player.y_offset > MAX_JUMP_HEIGHT) {
                 player.y_offset = MAX_JUMP_HEIGHT;
             }
+        }
+
+        // Fall-through death check - if player falls too far past center line
+        if (player.y_offset > 40 || player.y_offset < -40) {
+            // Player fell through a hole - lose a life and respawn
+            if (lives > 0) {
+                lives--;
+                update_hud();
+            }
+            // Respawn player on center line
+            player.y_offset = 0;
+            player.vy = 0;
+            player.is_jumping = 0;
+            player.x = SCREEN_WIDTH / 2;
+        }
+    } else {
+        // Not jumping - check if walking onto a destroyed tile
+        if (get_center_line_tile_at(player.x) == 1) {
+            // Start falling!
+            player.is_jumping = 1;
+            player.vy = (player.facing == DIR_UP) ? GRAVITY : -GRAVITY;
         }
     }
 

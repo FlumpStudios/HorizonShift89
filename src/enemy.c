@@ -26,10 +26,32 @@ void spawn_enemy(void) {
         if (!enemies[i].active) {
             enemies[i].active = 1;
 
-            uint8_t enemy_roll = rand() & 3;  // 0-3
+            uint8_t enemy_roll = rand() & 7;  // 0-7
 
             if (enemy_roll == 0) {
-                // 25% chance: Spawn shooter enemy (horizontal mover)
+                // ~12.5% chance: Spawn asteroid enemy (falls straight toward center)
+                enemies[i].type = ENEMY_ASTEROID;
+
+                // Random X position
+                enemies[i].x = ((rand() % (SCREEN_WIDTH - 16)) + 8) << 8;
+
+                // Randomly spawn from top or bottom
+                if (rand() & 1) {
+                    enemies[i].y = 0;
+                    enemies[i].dir = DIR_DOWN;
+                    enemies[i].vy = 2 + (rand() & 1);  // Speed 2-3
+                } else {
+                    enemies[i].y = (SCREEN_HEIGHT) << 8;
+                    enemies[i].dir = DIR_UP;
+                    enemies[i].vy = -(2 + (rand() & 1));  // Speed 2-3
+                }
+
+                enemies[i].vx = 0;  // No horizontal movement
+                enemies[i].shoot_timer = 0;
+
+                set_sprite_tile(enemies[i].sprite_id, TILE_ASTEROID);
+            } else if (enemy_roll == 1) {
+                // ~12.5% chance: Spawn shooter enemy (horizontal mover)
                 enemies[i].type = ENEMY_SHOOTER;
 
                 // Spawn from left or right edge
@@ -59,8 +81,8 @@ void spawn_enemy(void) {
 
                 // Set sprite tile for shooter
                 set_sprite_tile(enemies[i].sprite_id, TILE_SHOOTER);
-            } else if (enemy_roll == 1) {
-                // 25% chance: Spawn zigzag enemy
+            } else if (enemy_roll == 2) {
+                // ~12.5% chance: Spawn zigzag enemy
                 enemies[i].type = ENEMY_ZIGZAG;
 
                 // Random X position (center area so it has room to zigzag)
@@ -188,6 +210,37 @@ void update_enemies(void) {
                             update_hud();
                         }
                     }
+                }
+            } else if (enemies[i].type == ENEMY_ASTEROID) {
+                // Asteroid enemy - falls straight toward center line
+                enemies[i].y += enemies[i].vy << 8;
+
+                uint8_t enemy_screen_x = enemies[i].x >> 8;
+                uint8_t enemy_screen_y = enemies[i].y >> 8;
+
+                // Check if reached center line
+                if (enemies[i].dir == DIR_DOWN) {
+                    if (enemy_screen_y >= CENTER_LINE_Y - 4) {
+                        // Asteroid hit the line - destroy sections (1-2 tiles radius)
+                        destroy_center_line_section(enemy_screen_x, 1 + (rand() & 1));
+                        enemies[i].active = 0;
+                        move_sprite(enemies[i].sprite_id, 0, 0);
+                        // No life lost from asteroid hitting line
+                    }
+                } else {
+                    if (enemy_screen_y <= CENTER_LINE_Y + 4) {
+                        // Asteroid hit the line - destroy sections
+                        destroy_center_line_section(enemy_screen_x, 1 + (rand() & 1));
+                        enemies[i].active = 0;
+                        move_sprite(enemies[i].sprite_id, 0, 0);
+                        // No life lost from asteroid hitting line
+                    }
+                }
+
+                // Check if asteroid went off screen
+                if (enemy_screen_y > SCREEN_HEIGHT + 8 || enemy_screen_y < 8) {
+                    enemies[i].active = 0;
+                    move_sprite(enemies[i].sprite_id, 0, 0);
                 }
             } else {
                 // Normal enemy - moves vertically toward center line

@@ -30,11 +30,11 @@ void check_collisions(void) {
         for (uint8_t e = 0; e < MAX_ENEMIES; e++) {
             if (!enemies[e].active) continue;
 
-            // For shooter enemies, can hit from any direction
+            // For shooter and asteroid enemies, can hit from any direction
             // For normal enemies, must match direction
             uint8_t can_hit = 0;
-            if (enemies[e].type == ENEMY_SHOOTER) {
-                can_hit = 1;  // Shooters can be hit by any bullet
+            if (enemies[e].type == ENEMY_SHOOTER || enemies[e].type == ENEMY_ASTEROID) {
+                can_hit = 1;  // Shooters and asteroids can be hit by any bullet
             } else {
                 // Normal enemies: bullet going up hits enemies from top, etc.
                 if ((bullets[b].dir == DIR_UP && enemies[e].dir == DIR_DOWN) ||
@@ -54,6 +54,8 @@ void check_collisions(void) {
                 // Add score (more for special enemies)
                 if (enemies[e].type == ENEMY_SHOOTER) {
                     score += 25;
+                } else if (enemies[e].type == ENEMY_ASTEROID) {
+                    score += 20;
                 } else if (enemies[e].type == ENEMY_ZIGZAG) {
                     score += 15;
                 } else {

@@ -19,6 +19,7 @@ uint8_t lives;
 uint8_t level;
 uint16_t frame_count;
 uint8_t spawn_timer;
+uint8_t prev_level;
 
 // --- Title Screen ---
 void show_title(void) {
@@ -62,6 +63,7 @@ void init_game(void) {
     score = 0;
     lives = 3;
     level = 1;
+    prev_level = 1;
     frame_count = 0;
     spawn_timer = 60;  // Spawn first enemy after 1 second
 
@@ -70,9 +72,10 @@ void init_game(void) {
     init_enemies();
     init_bullets();
     init_enemy_bullets();
+    reset_center_line();
 
-    // Load sprite data (6 tiles: player up/down, enemy, bullet, shooter, enemy bullet)
-    set_sprite_data(0, 7, sprite_data);
+    // Load sprite data (8 tiles: player up/down, enemy, bullet, shooter, enemy bullet, zigzag, asteroid)
+    set_sprite_data(0, 8, sprite_data);
 
     // Enable sprites
     SHOW_SPRITES;
@@ -115,6 +118,13 @@ void update_game(void) {
     // Level up every 500 points
     if (score >= level * 500 && level < 9) {
         level++;
+    }
+
+    // Reset center line when level increases
+    if (level > prev_level) {
+        reset_center_line();
+        draw_center_line();
+        prev_level = level;
     }
 }
 

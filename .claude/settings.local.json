@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(dir C:ProjectsGBHorizonShift89src*.c)",
-      "Bash(del \"C:\\\\Projects\\\\GB\\\\HorizonShift89\\\\src\\\\enemy_bullet.c\")"
+      "Bash(del \"C:\\\\Projects\\\\GB\\\\HorizonShift89\\\\src\\\\enemy_bullet.c\")",
+      "Bash(make)",
+      "Bash(C:ProjectsGBHorizonShift89build.bat)",
+      "Bash(cmd.exe /c \"C:\\\\Projects\\\\GB\\\\HorizonShift89\\\\build.bat\")",
+      "Bash(git -C \"C:\\\\Projects\\\\GB\\\\HorizonShift89\" log --oneline -10)"
     ]
   }
 }

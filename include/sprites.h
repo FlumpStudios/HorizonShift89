@@ -13,6 +13,7 @@
 // Tile 4: Shooter enemy (horizontal mover)
 // Tile 5: Enemy bullet
 // Tile 6: Zigzag enemy (wavy mover)
+// Tile 7: Asteroid (rocky shape)
 
 const uint8_t sprite_data[] = {
     // Tile 0: Player facing UP - simple arrow shape
@@ -83,7 +84,17 @@ const uint8_t sprite_data[] = {
     0x5A, 0x5A,  // .X.XX.X.
     0x3C, 0x3C,  // ..XXXX..
     0x09, 0x09,  // ....X..X
-    0x06, 0x06   // .....XX.
+    0x06, 0x06,  // .....XX.
+
+    // Tile 7: Asteroid - rocky/chunky shape
+    0x1C, 0x1C,  // ...XXX..
+    0x3E, 0x22,  // ..XXXXX.
+    0x7F, 0x63,  // .XXXXXXX
+    0xFF, 0xC3,  // XXXXXXXX
+    0xFE, 0xC6,  // XXXXXXX.
+    0x7C, 0x44,  // .XXXXX..
+    0x38, 0x28,  // ..XXX...
+    0x10, 0x10   // ...X....
 };
 
 #endif

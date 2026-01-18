@@ -49,8 +49,8 @@ typedef enum {
 
 // --- Entity Structure ---
 typedef struct {
-    int16_t x;          // X position (fixed point 8.8 for smooth movement)
-    int16_t y;          // Y position (fixed point 8.8)
+    uint16_t x;         // X position (fixed point 8.8 for smooth movement)
+    uint16_t y;         // Y position (fixed point 8.8)
     int8_t  vx;         // X velocity
     int8_t  vy;         // Y velocity
     uint8_t active;     // Is entity active?

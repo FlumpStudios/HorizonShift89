@@ -7,10 +7,10 @@
 
 // Simple AABB collision check
 uint8_t check_collision(Entity* a, Entity* b) {
-    int16_t ax = a->x >> 8;
-    int16_t ay = a->y >> 8;
-    int16_t bx = b->x >> 8;
-    int16_t by = b->y >> 8;
+    uint8_t ax = a->x >> 8;
+    uint8_t ay = a->y >> 8;
+    uint8_t bx = b->x >> 8;
+    uint8_t by = b->y >> 8;
 
     // Check if bounding boxes overlap
     if (ax < bx + HITBOX_SIZE &&

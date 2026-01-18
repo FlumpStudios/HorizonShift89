@@ -125,9 +125,6 @@ void render_game(void) {
 
 // --- Main ---
 void main(void) {
-    // Initialize random seed
-    initrand(DIV_REG);
-
     // Disable interrupts during setup
     disable_interrupts();
 
@@ -141,6 +138,8 @@ void main(void) {
         switch(game_state) {
             case STATE_TITLE:
                 show_title();
+                // Seed random AFTER title screen - user timing adds entropy
+                initrand(DIV_REG);
                 init_game();
                 break;
 
@@ -159,11 +158,15 @@ void main(void) {
                 break;
 
             case STATE_PAUSED:
-                // Simple pause - wait for start
-                if (joypad() & J_START) {
-                    waitpadup();
-                    game_state = STATE_PLAYING;
-                }
+                // Show paused text
+                printf("\n\n\n\n\n\n\n      PAUSED");
+                waitpad(J_START);
+                waitpadup();
+                // Restore screen
+                cls();
+                draw_center_line();
+                update_hud();
+                game_state = STATE_PLAYING;
                 break;
         }
 

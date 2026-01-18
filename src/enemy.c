@@ -8,6 +8,10 @@
 void init_enemies(void) {
     for (uint8_t i = 0; i < MAX_ENEMIES; i++) {
         enemies[i].active = 0;
+        enemies[i].x = 0;
+        enemies[i].y = 0;
+        enemies[i].vx = 0;
+        enemies[i].vy = 0;
         enemies[i].sprite_id = SPRITE_ENEMY_START + i;
         // Hide sprite
         move_sprite(enemies[i].sprite_id, 0, 0);
@@ -59,7 +63,7 @@ void update_enemies(void) {
             enemies[i].y += enemies[i].vy << 8;
 
             // Check if enemy reached center line (player loses life)
-            int16_t enemy_screen_y = enemies[i].y >> 8;
+            uint8_t enemy_screen_y = enemies[i].y >> 8;
 
             if (enemies[i].dir == DIR_DOWN) {
                 // Coming from top
@@ -88,7 +92,7 @@ void update_enemies(void) {
             }
 
             // Check if enemy went off screen (shouldn't happen normally)
-            if (enemy_screen_y < -8 || enemy_screen_y > SCREEN_HEIGHT + 8) {
+            if (enemy_screen_y > SCREEN_HEIGHT + 8) {
                 enemies[i].active = 0;
                 move_sprite(enemies[i].sprite_id, 0, 0);
             }

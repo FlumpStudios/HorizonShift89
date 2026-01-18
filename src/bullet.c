@@ -7,6 +7,10 @@
 void init_bullets(void) {
     for (uint8_t i = 0; i < MAX_BULLETS; i++) {
         bullets[i].active = 0;
+        bullets[i].x = 0;
+        bullets[i].y = 0;
+        bullets[i].vx = 0;
+        bullets[i].vy = 0;
         bullets[i].sprite_id = SPRITE_BULLET_START + i;
         // Hide sprite
         move_sprite(bullets[i].sprite_id, 0, 0);
@@ -44,9 +48,9 @@ void update_bullets(void) {
             // Move bullet
             bullets[i].y += bullets[i].vy << 8;
 
-            // Check if bullet went off screen
-            int16_t bullet_screen_y = bullets[i].y >> 8;
-            if (bullet_screen_y < -8 || bullet_screen_y > SCREEN_HEIGHT + 8) {
+            // Check if bullet went off screen (unsigned, so check wrap-around)
+            uint16_t bullet_y = bullets[i].y >> 8;
+            if (bullet_y > SCREEN_HEIGHT + 8) {
                 bullets[i].active = 0;
                 move_sprite(bullets[i].sprite_id, 0, 0);
             }

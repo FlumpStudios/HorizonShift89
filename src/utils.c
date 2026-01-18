@@ -22,13 +22,13 @@ void draw_center_line(void) {
 void update_hud(void) {
     // Score at top-left
     gotoxy(0, 0);
-    printf("SC:%05u", score);
-
-    // Lives at top-right
-    gotoxy(14, 0);
-    printf("L:%u", lives);
+    printf("%05u", score);
 
     // Level indicator
-    gotoxy(10, 0);
-    printf("Lv%u", level);
+    gotoxy(6, 0);
+    printf("L%u", level);
+
+    // Lives at top-right (show hearts/count clearly)
+    gotoxy(16, 0);
+    printf("x%u", lives);
 }

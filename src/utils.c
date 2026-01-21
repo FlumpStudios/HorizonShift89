@@ -5,6 +5,7 @@
 #include <gbdk/console.h>
 #include <stdio.h>
 #include "game.h"
+#include "script.h"
 
 // Center line state: 0 = intact, 1 = destroyed
 uint8_t center_line_state[CENTER_LINE_TILES];
@@ -55,15 +56,19 @@ void draw_center_line(void) {
     }
 }
 
-// Update the HUD display (score, lives)
+// Update the HUD display (score, wave, kills, lives)
 void update_hud(void) {
     // Score at top-left
     gotoxy(0, 0);
     printf("%05u", score);
 
-    // Level indicator
+    // Wave indicator
     gotoxy(6, 0);
-    printf("L%u", level);
+    printf("W%u", current_wave);
+
+    // Kill progress
+    gotoxy(10, 0);
+    printf("%u/%u", wave_kills, wave_kills_required);
 
     // Lives at top-right (show hearts/count clearly)
     gotoxy(16, 0);

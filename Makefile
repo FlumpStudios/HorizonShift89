@@ -24,7 +24,7 @@ LCCFLAGS = -Wa-l -Wl-m -Wl-j -Wm-yoA -Wm-yt0x1B -Wm-yn"$(ROM_NAME)"
 LCCFLAGS += -I$(INC_DIR) -I$(RES_DIR)
 
 # --- Source Files ---
-SRCS = $(SRC_DIR)/main.c $(SRC_DIR)/player.c $(SRC_DIR)/enemy.c $(SRC_DIR)/bullet.c $(SRC_DIR)/collision.c $(SRC_DIR)/utils.c $(wildcard $(RES_DIR)/*.c)
+SRCS = $(SRC_DIR)/main.c $(SRC_DIR)/player.c $(SRC_DIR)/enemy.c $(SRC_DIR)/bullet.c $(SRC_DIR)/collision.c $(SRC_DIR)/utils.c $(SRC_DIR)/starfield.c $(SRC_DIR)/script.c $(wildcard $(RES_DIR)/*.c)
 OBJS = $(SRCS:.c=.o)
 
 # --- Targets ---

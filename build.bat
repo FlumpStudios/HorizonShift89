@@ -5,7 +5,7 @@ echo.
 set GBDK=C:\Projects\GB\gbdk
 set PROJECT=C:\Projects\GB\HorizonShift89
 
-"%GBDK%\bin\lcc" -Wa-l -Wl-m -Wl-j -Wm-yoA -Wm-yt0x1B -Wm-yn"HorizonShift89" -Iinclude -o build\HorizonShift89.gb src\main.c src\player.c src\enemy.c src\bullet.c src\collision.c src\utils.c
+"%GBDK%\bin\lcc" -Wa-l -Wl-m -Wl-j -Wm-yoA -Wm-yt0x1B -Wm-yn"HorizonShift89" -Iinclude -o build\HorizonShift89.gb src\main.c src\player.c src\enemy.c src\bullet.c src\collision.c src\utils.c src\starfield.c src\script.c
 
 if %ERRORLEVEL% EQU 0 (
     echo.

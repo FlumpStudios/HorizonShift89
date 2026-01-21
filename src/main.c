@@ -8,6 +8,7 @@
 #include <rand.h>
 #include "game.h"
 #include "sprites.h"
+#include "script.h"
 
 // --- Global Variables ---
 GameState game_state;
@@ -57,6 +58,12 @@ void show_gameover(void) {
     waitpadup();
 }
 
+// --- Wave Complete Screen ---
+void show_wave_complete(void) {
+    gotoxy(3, 8);
+    printf("WAVE COMPLETE!");
+}
+
 // --- Initialize Game ---
 void init_game(void) {
     // Reset game variables
@@ -73,9 +80,10 @@ void init_game(void) {
     init_bullets();
     init_enemy_bullets();
     reset_center_line();
+    init_wave_system();
 
-    // Load sprite data (8 tiles: player up/down, enemy, bullet, shooter, enemy bullet, zigzag, asteroid)
-    set_sprite_data(0, 8, sprite_data);
+    // Load sprite data (9 tiles: player up/down, enemy, bullet, shooter, enemy bullet, zigzag, asteroid, star)
+    set_sprite_data(0, 9, sprite_data);
 
     // Enable sprites
     SHOW_SPRITES;
@@ -85,20 +93,51 @@ void init_game(void) {
     draw_center_line();
     update_hud();
 
+    // Initialize starfield background (after cls so stars aren't erased)
+    init_starfield();
+
     game_state = STATE_PLAYING;
+}
+
+// --- Clear All Active Enemies and Bullets ---
+void clear_all_entities(void) {
+    // Clear all enemies
+    for (uint8_t i = 0; i < MAX_ENEMIES; i++) {
+        if (enemies[i].active) {
+            enemies[i].active = 0;
+            move_sprite(enemies[i].sprite_id, 0, 0);
+        }
+    }
+    // Clear all player bullets
+    for (uint8_t i = 0; i < MAX_BULLETS; i++) {
+        if (bullets[i].active) {
+            bullets[i].active = 0;
+            move_sprite(bullets[i].sprite_id, 0, 0);
+        }
+    }
+    // Clear all enemy bullets
+    for (uint8_t i = 0; i < MAX_ENEMY_BULLETS; i++) {
+        if (enemy_bullets[i].active) {
+            enemy_bullets[i].active = 0;
+            move_sprite(enemy_bullets[i].sprite_id, 0, 0);
+        }
+    }
 }
 
 // --- Main Update Loop ---
 void update_game(void) {
     frame_count++;
 
-    // Spawn enemies periodically
+    // Spawn enemies periodically using wave spawn rate
     spawn_timer--;
     if (spawn_timer == 0) {
         spawn_enemy();
-        // Faster spawning at higher levels
-        spawn_timer = 90 - (level * 10);
-        if (spawn_timer < 30) spawn_timer = 30;
+        // Get spawn rate from wave scripts
+        uint8_t wave_index = current_wave - 1;
+        if (wave_index >= MAX_WAVES) {
+            wave_index = MAX_WAVES - 1;
+        }
+        spawn_timer = wave_scripts[wave_index].spawn_rate;
     }
 
     // Update game entities
@@ -106,6 +145,9 @@ void update_game(void) {
     update_enemies();
     update_bullets();
     update_enemy_bullets();
+
+    // Update starfield twinkling
+    update_starfield();
 
     // Check for collisions
     check_collisions();
@@ -115,16 +157,12 @@ void update_game(void) {
         game_state = STATE_GAMEOVER;
     }
 
-    // Level up every 500 points
-    if (score >= level * 500 && level < 9) {
-        level++;
-    }
-
-    // Reset center line when level increases
-    if (level > prev_level) {
-        reset_center_line();
-        draw_center_line();
-        prev_level = level;
+    // Check wave completion
+    if (wave_kills >= wave_kills_required) {
+        // Wave complete! Clear all enemies and bullets
+        clear_all_entities();
+        wave_complete_timer = 90;  // ~1.5 seconds at 60fps
+        game_state = STATE_WAVE_COMPLETE;
     }
 }
 
@@ -180,6 +218,33 @@ void main(void) {
                 draw_center_line();
                 update_hud();
                 game_state = STATE_PLAYING;
+                break;
+
+            case STATE_WAVE_COMPLETE:
+                // Show wave complete message on first frame
+                if (wave_complete_timer == 90) {
+                    show_wave_complete();
+                }
+
+                // Count down the timer
+                wave_complete_timer--;
+
+                // When timer expires, advance to next wave
+                if (wave_complete_timer == 0) {
+                    advance_wave();
+                    reset_center_line();
+                    spawn_timer = 60;  // Give player a moment before spawns resume
+
+                    // Restore screen
+                    cls();
+                    draw_center_line();
+                    update_hud();
+
+                    // Re-initialize starfield
+                    init_starfield();
+
+                    game_state = STATE_PLAYING;
+                }
                 break;
         }
 

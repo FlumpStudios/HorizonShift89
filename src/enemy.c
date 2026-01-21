@@ -4,6 +4,7 @@
 #include <gb/gb.h>
 #include <rand.h>
 #include "game.h"
+#include "script.h"
 
 void init_enemies(void) {
     for (uint8_t i = 0; i < MAX_ENEMIES; i++) {
@@ -26,10 +27,11 @@ void spawn_enemy(void) {
         if (!enemies[i].active) {
             enemies[i].active = 1;
 
-            uint8_t enemy_roll = rand() & 7;  // 0-7
+            // Get enemy type based on current wave
+            EnemyType enemy_type = get_random_enemy_for_wave(current_wave);
 
-            if (enemy_roll == 0) {
-                // ~12.5% chance: Spawn asteroid enemy (falls straight toward center)
+            if (enemy_type == ENEMY_ASTEROID) {
+                // Spawn asteroid enemy (falls straight toward center)
                 enemies[i].type = ENEMY_ASTEROID;
 
                 // Random X position
@@ -50,8 +52,8 @@ void spawn_enemy(void) {
                 enemies[i].shoot_timer = 0;
 
                 set_sprite_tile(enemies[i].sprite_id, TILE_ASTEROID);
-            } else if (enemy_roll == 1) {
-                // ~12.5% chance: Spawn shooter enemy (horizontal mover)
+            } else if (enemy_type == ENEMY_SHOOTER) {
+                // Spawn shooter enemy (horizontal mover)
                 enemies[i].type = ENEMY_SHOOTER;
 
                 // Spawn from left or right edge
@@ -81,8 +83,8 @@ void spawn_enemy(void) {
 
                 // Set sprite tile for shooter
                 set_sprite_tile(enemies[i].sprite_id, TILE_SHOOTER);
-            } else if (enemy_roll == 2) {
-                // ~12.5% chance: Spawn zigzag enemy
+            } else if (enemy_type == ENEMY_ZIGZAG) {
+                // Spawn zigzag enemy
                 enemies[i].type = ENEMY_ZIGZAG;
 
                 // Random X position (center area so it has room to zigzag)
@@ -105,7 +107,7 @@ void spawn_enemy(void) {
 
                 set_sprite_tile(enemies[i].sprite_id, TILE_ZIGZAG);
             } else {
-                // 50% chance: Spawn normal enemy (vertical mover)
+                // Spawn normal enemy (vertical mover)
                 enemies[i].type = ENEMY_NORMAL;
 
                 // Random X position

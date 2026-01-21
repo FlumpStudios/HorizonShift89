@@ -49,6 +49,11 @@
 #define TILE_ENEMY_BULLET   5
 #define TILE_ZIGZAG         6
 #define TILE_ASTEROID       7
+#define TILE_STAR           8
+
+// --- Starfield Constants ---
+#define NUM_STARS           20
+#define TWINKLE_RATE        8   // Frames between twinkle updates
 
 // --- Center Line Constants ---
 #define CENTER_LINE_TILES   20
@@ -72,7 +77,8 @@ typedef enum {
     STATE_TITLE,
     STATE_PLAYING,
     STATE_GAMEOVER,
-    STATE_PAUSED
+    STATE_PAUSED,
+    STATE_WAVE_COMPLETE
 } GameState;
 
 // --- Entity Structure ---
@@ -159,5 +165,9 @@ void update_hud(void);
 void reset_center_line(void);
 void destroy_center_line_section(uint8_t x, uint8_t radius);
 uint8_t get_center_line_tile_at(uint8_t x);
+
+// starfield.c
+void init_starfield(void);
+void update_starfield(void);
 
 #endif

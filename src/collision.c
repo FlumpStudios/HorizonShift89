@@ -2,6 +2,7 @@
 
 #include <gb/gb.h>
 #include "game.h"
+#include "script.h"
 
 #define HITBOX_SIZE 6  // Collision box size in pixels
 
@@ -50,6 +51,9 @@ void check_collisions(void) {
 
                 enemies[e].active = 0;
                 move_sprite(enemies[e].sprite_id, 0, 0);
+
+                // Track wave kills
+                wave_kills++;
 
                 // Add score (more for special enemies)
                 if (enemies[e].type == ENEMY_SHOOTER) {

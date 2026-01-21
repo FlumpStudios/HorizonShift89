@@ -136,56 +136,53 @@ void update_player(void) {
         // Apply gravity (toward center line)
         if (player.facing == DIR_UP) {
             player.vy += GRAVITY;
-            // Landed back on line?
-            if (player.y_offset >= 0) {
-                // Check if landing on destroyed section
-                if (get_center_line_tile_at(player.x) == 1) {
-                    // Tile is destroyed - keep falling through!
-                    player.y_offset = 1;  // Start falling below the line
-                    player.vy = GRAVITY;  // Fall downward
-                } else {
-                    player.y_offset = 0;
-                    player.vy = 0;
-                    player.is_jumping = 0;
-                }
+            // Landed back on line? Only land if tile is intact
+            if (player.y_offset >= 0 && get_center_line_tile_at(player.x) == 0) {
+                player.y_offset = 0;
+                player.vy = 0;
+                player.is_jumping = 0;
             }
+            // If tile is destroyed, keep falling (do nothing)
             // Cap jump height
             if (player.y_offset < -MAX_JUMP_HEIGHT) {
                 player.y_offset = -MAX_JUMP_HEIGHT;
             }
         } else {
             player.vy -= GRAVITY;
-            // Landed back on line?
-            if (player.y_offset <= 0) {
-                // Check if landing on destroyed section
-                if (get_center_line_tile_at(player.x) == 1) {
-                    // Tile is destroyed - keep falling through!
-                    player.y_offset = -1;  // Start falling above the line
-                    player.vy = -GRAVITY;  // Fall upward
-                } else {
-                    player.y_offset = 0;
-                    player.vy = 0;
-                    player.is_jumping = 0;
-                }
+            // Landed back on line? Only land if tile is intact
+            if (player.y_offset <= 0 && get_center_line_tile_at(player.x) == 0) {
+                player.y_offset = 0;
+                player.vy = 0;
+                player.is_jumping = 0;
             }
+            // If tile is destroyed, keep falling (do nothing)
             // Cap jump height
             if (player.y_offset > MAX_JUMP_HEIGHT) {
                 player.y_offset = MAX_JUMP_HEIGHT;
             }
         }
 
-        // Fall-through death check - if player falls too far past center line
-        if (player.y_offset > 40 || player.y_offset < -40) {
-            // Player fell through a hole - lose a life and respawn
+        // Fall-through death check - if player falls off screen
+        // Screen is 144px, center at 72, so ±80 ensures fully off screen
+        if (player.y_offset > 80 || player.y_offset < -80) {
+            // Player fell through a hole - lose a life
             if (lives > 0) {
                 lives--;
-                update_hud();
             }
-            // Respawn player on center line
+
+            // Rebuild the center line
+            reset_center_line();
+            draw_center_line();
+
+            // Respawn player at initial position
             player.y_offset = 0;
             player.vy = 0;
             player.is_jumping = 0;
             player.x = SCREEN_WIDTH / 2;
+            player.facing = DIR_UP;
+            set_sprite_tile(player.sprite_id, TILE_PLAYER_UP);
+
+            update_hud();
         }
     } else {
         // Not jumping - check if walking onto a destroyed tile

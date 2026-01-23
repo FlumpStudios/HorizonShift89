@@ -21,6 +21,7 @@ uint8_t level;
 uint16_t frame_count;
 uint8_t spawn_timer;
 uint8_t prev_level;
+uint8_t countdown_timer;
 
 // --- Title Screen ---
 void show_title(void) {
@@ -85,6 +86,10 @@ void init_game(void) {
     // Load sprite data (9 tiles: player up/down, enemy, bullet, shooter, enemy bullet, zigzag, asteroid, star)
     set_sprite_data(0, 9, sprite_data);
 
+    // Set up sprite palettes
+    OBP0_REG = 0xE4;  // Normal: black, dark gray, light gray, white
+    OBP1_REG = 0x90;  // Lighter (knockback): black, light gray, white, white
+
     // Enable sprites
     SHOW_SPRITES;
 
@@ -96,7 +101,9 @@ void init_game(void) {
     // Initialize starfield background (after cls so stars aren't erased)
     init_starfield();
 
-    game_state = STATE_PLAYING;
+    // Start countdown sequence
+    countdown_timer = 240;  // 4 seconds total (60fps * 4)
+    game_state = STATE_COUNTDOWN;
 }
 
 // --- Clear All Active Enemies and Bullets ---
@@ -161,7 +168,7 @@ void update_game(void) {
     if (wave_kills >= wave_kills_required) {
         // Wave complete! Clear all enemies and bullets
         clear_all_entities();
-        wave_complete_timer = 90;  // ~1.5 seconds at 60fps
+        wave_complete_timer = 150;  // ~2.5 seconds at 60fps
         game_state = STATE_WAVE_COMPLETE;
     }
 }
@@ -194,6 +201,33 @@ void main(void) {
                 init_game();
                 break;
 
+            case STATE_COUNTDOWN:
+                // Display countdown: 3, 2, 1, GET READY!
+                // 240-181: "3", 180-121: "2", 120-61: "1", 60-1: "GET READY!"
+                if (countdown_timer == 240) {
+                    gotoxy(8, 7);
+                    printf("  3  ");
+                } else if (countdown_timer == 180) {
+                    gotoxy(8, 7);
+                    printf("  2  ");
+                } else if (countdown_timer == 120) {
+                    gotoxy(8, 7);
+                    printf("  1  ");
+                } else if (countdown_timer == 60) {
+                    gotoxy(6, 7);
+                    printf("GET READY!");
+                }
+
+                countdown_timer--;
+
+                if (countdown_timer == 0) {
+                    // Clear the countdown text and start game
+                    gotoxy(6, 7);
+                    printf("          ");
+                    game_state = STATE_PLAYING;
+                }
+                break;
+
             case STATE_PLAYING:
                 update_game();
                 render_game();
@@ -222,8 +256,14 @@ void main(void) {
 
             case STATE_WAVE_COMPLETE:
                 // Show wave complete message on first frame
-                if (wave_complete_timer == 90) {
+                if (wave_complete_timer == 150) {
                     show_wave_complete();
+                }
+
+                // After 1 second, show the next wave number
+                if (wave_complete_timer == 90) {
+                    gotoxy(3, 8);
+                    printf("   Wave %u     ", current_wave + 1);
                 }
 
                 // Count down the timer

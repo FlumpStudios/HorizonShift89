@@ -30,6 +30,7 @@ void check_collisions(void) {
 
         for (uint8_t e = 0; e < MAX_ENEMIES; e++) {
             if (!enemies[e].active) continue;
+            if (enemies[e].knockback) continue;  // Knockback enemies are invulnerable
 
             // For shooter and asteroid enemies, can hit from any direction
             // For normal enemies, must match direction
@@ -72,13 +73,15 @@ void check_collisions(void) {
         }
     }
 
+    // Get player position (player.x is already screen coords)
+    // Include facing offset with extra pixel separation to prevent cross-side collisions
+    int8_t facing_offset = (player.facing == DIR_UP) ? -4 : 3;
+    uint8_t player_x = player.x;
+    uint8_t player_y = CENTER_LINE_Y + player.y_offset + facing_offset;
+
     // Check enemy bullet vs player collisions
     for (uint8_t b = 0; b < MAX_ENEMY_BULLETS; b++) {
         if (!enemy_bullets[b].active) continue;
-
-        // Get player position (player.x is already screen coords, y is CENTER_LINE_Y + y_offset)
-        uint8_t player_x = player.x;
-        uint8_t player_y = CENTER_LINE_Y + player.y_offset;
 
         // Get enemy bullet position
         uint8_t bullet_x = enemy_bullets[b].x >> 8;
@@ -97,6 +100,95 @@ void check_collisions(void) {
             if (lives > 0) {
                 lives--;
                 update_hud();
+            }
+        }
+    }
+
+    // Check enemy vs player collisions
+    for (uint8_t e = 0; e < MAX_ENEMIES; e++) {
+        if (!enemies[e].active) continue;
+        if (enemies[e].knockback) continue;  // Already in knockback, skip
+
+        // Get enemy position
+        uint8_t enemy_x = enemies[e].x >> 8;
+        uint8_t enemy_y = enemies[e].y >> 8;
+
+        // Simple AABB collision
+        if (player_x < enemy_x + HITBOX_SIZE &&
+            player_x + HITBOX_SIZE > enemy_x &&
+            player_y < enemy_y + HITBOX_SIZE &&
+            player_y + HITBOX_SIZE > enemy_y) {
+
+            if (player.is_dashing) {
+                // Dash-kill! Set enemy to knockback state
+                enemies[e].knockback = 1;
+                enemies[e].vx = 0;
+                // Send enemy flying back the way it came
+                if (enemies[e].dir == DIR_DOWN) {
+                    enemies[e].vy = -KNOCKBACK_SPEED;  // Fly up
+                } else {
+                    enemies[e].vy = KNOCKBACK_SPEED;   // Fly down
+                }
+                // Switch to lighter palette
+                set_sprite_prop(enemies[e].sprite_id, S_PALETTE);
+            } else {
+                // Normal collision - player loses life
+                enemies[e].active = 0;
+                move_sprite(enemies[e].sprite_id, 0, 0);
+
+                if (lives > 0) {
+                    lives--;
+                    update_hud();
+                }
+            }
+        }
+    }
+
+    // Check knockback enemy vs normal enemy collisions
+    for (uint8_t k = 0; k < MAX_ENEMIES; k++) {
+        if (!enemies[k].active || !enemies[k].knockback) continue;
+
+        uint8_t kb_x = enemies[k].x >> 8;
+        uint8_t kb_y = enemies[k].y >> 8;
+
+        for (uint8_t e = 0; e < MAX_ENEMIES; e++) {
+            if (!enemies[e].active || enemies[e].knockback) continue;  // Skip inactive and other knockback enemies
+            if (k == e) continue;  // Don't check against self
+
+            uint8_t enemy_x = enemies[e].x >> 8;
+            uint8_t enemy_y = enemies[e].y >> 8;
+
+            // Simple AABB collision
+            if (kb_x < enemy_x + HITBOX_SIZE &&
+                kb_x + HITBOX_SIZE > enemy_x &&
+                kb_y < enemy_y + HITBOX_SIZE &&
+                kb_y + HITBOX_SIZE > enemy_y) {
+
+                // Knockback enemy hit a normal enemy - destroy both with 3x bonus
+                enemies[e].active = 0;
+                move_sprite(enemies[e].sprite_id, 0, 0);
+
+                enemies[k].active = 0;
+                enemies[k].knockback = 0;
+                set_sprite_prop(enemies[k].sprite_id, 0);  // Reset palette
+                move_sprite(enemies[k].sprite_id, 0, 0);
+
+                // Track wave kills (both enemies count)
+                wave_kills += 2;
+
+                // 3x score bonus for the hit enemy
+                if (enemies[e].type == ENEMY_SHOOTER) {
+                    score += 75;  // 25 * 3
+                } else if (enemies[e].type == ENEMY_ASTEROID) {
+                    score += 60;  // 20 * 3
+                } else if (enemies[e].type == ENEMY_ZIGZAG) {
+                    score += 45;  // 15 * 3
+                } else {
+                    score += 30;  // 10 * 3
+                }
+                update_hud();
+
+                break;  // Knockback enemy can only hit one enemy
             }
         }
     }

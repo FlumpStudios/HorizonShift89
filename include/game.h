@@ -33,6 +33,7 @@
 #define DASH_DURATION       8
 #define DASH_COOLDOWN       20
 #define DOUBLE_TAP_WINDOW   12
+#define KNOCKBACK_SPEED     6   // Speed enemies fly back when dash-killed
 
 // --- Sprite Constants ---
 #define SPRITE_PLAYER       0
@@ -75,6 +76,7 @@ typedef enum {
 // --- Game States ---
 typedef enum {
     STATE_TITLE,
+    STATE_COUNTDOWN,
     STATE_PLAYING,
     STATE_GAMEOVER,
     STATE_PAUSED,
@@ -92,6 +94,7 @@ typedef struct {
     Direction dir;      // Direction facing (for enemies: which side they come from)
     uint8_t type;       // EnemyType (for enemies only)
     uint8_t shoot_timer; // Frames until next shot (for shooter enemies)
+    uint8_t knockback;  // Is enemy in knockback state? (hit by dashing player)
 } Entity;
 
 // --- Player Structure ---

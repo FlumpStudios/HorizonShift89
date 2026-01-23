@@ -15,6 +15,7 @@ void init_enemies(void) {
         enemies[i].vy = 0;
         enemies[i].type = ENEMY_NORMAL;
         enemies[i].shoot_timer = 0;
+        enemies[i].knockback = 0;
         enemies[i].sprite_id = SPRITE_ENEMY_START + i;
         // Hide sprite
         move_sprite(enemies[i].sprite_id, 0, 0);
@@ -147,6 +148,22 @@ void spawn_enemy(void) {
 void update_enemies(void) {
     for (uint8_t i = 0; i < MAX_ENEMIES; i++) {
         if (enemies[i].active) {
+            // Handle knockback state - enemy flies off screen
+            if (enemies[i].knockback) {
+                enemies[i].y += enemies[i].vy << 8;
+                uint8_t enemy_screen_y = enemies[i].y >> 8;
+
+                // Check if off screen
+                if (enemy_screen_y > SCREEN_HEIGHT + 16 || enemy_screen_y < 8) {
+                    enemies[i].active = 0;
+                    enemies[i].knockback = 0;
+                    // Reset to normal palette
+                    set_sprite_prop(enemies[i].sprite_id, 0);
+                    move_sprite(enemies[i].sprite_id, 0, 0);
+                }
+                continue;  // Skip normal movement logic
+            }
+
             if (enemies[i].type == ENEMY_SHOOTER) {
                 // Shooter enemy - moves horizontally
                 enemies[i].x += enemies[i].vx << 8;
@@ -169,50 +186,48 @@ void update_enemies(void) {
                     enemies[i].shoot_timer = SHOOTER_FIRE_RATE;
                 }
             } else if (enemies[i].type == ENEMY_ZIGZAG) {
-                // Zigzag enemy - moves vertically AND horizontally
-                enemies[i].y += enemies[i].vy << 8;
-                enemies[i].x += enemies[i].vx << 8;
+                // Zigzag enemy - moves vertically AND horizontally until it hits the line
+                if (enemies[i].vy != 0) {
+                    // Still approaching the center line
+                    enemies[i].y += enemies[i].vy << 8;
+                    enemies[i].x += enemies[i].vx << 8;
 
-                uint8_t enemy_screen_x = enemies[i].x >> 8;
-                uint8_t enemy_screen_y = enemies[i].y >> 8;
+                    uint8_t enemy_screen_x = enemies[i].x >> 8;
+                    uint8_t enemy_screen_y = enemies[i].y >> 8;
 
-                // Flip horizontal direction periodically
-                if (enemies[i].shoot_timer > 0) {
-                    enemies[i].shoot_timer--;
-                } else {
-                    enemies[i].vx = -enemies[i].vx;
-                    enemies[i].shoot_timer = ZIGZAG_FLIP_RATE;
-                }
-
-                // Bounce off screen edges
-                if (enemy_screen_x < 8) {
-                    enemies[i].x = 8 << 8;
-                    enemies[i].vx = ZIGZAG_SPEED;
-                } else if (enemy_screen_x > SCREEN_WIDTH - 8) {
-                    enemies[i].x = (SCREEN_WIDTH - 8) << 8;
-                    enemies[i].vx = -ZIGZAG_SPEED;
-                }
-
-                // Check if reached center line
-                if (enemies[i].dir == DIR_DOWN) {
-                    if (enemy_screen_y >= CENTER_LINE_Y - 4) {
-                        enemies[i].active = 0;
-                        move_sprite(enemies[i].sprite_id, 0, 0);
-                        if (lives > 0) {
-                            lives--;
-                            update_hud();
-                        }
+                    // Flip horizontal direction periodically
+                    if (enemies[i].shoot_timer > 0) {
+                        enemies[i].shoot_timer--;
+                    } else {
+                        enemies[i].vx = -enemies[i].vx;
+                        enemies[i].shoot_timer = ZIGZAG_FLIP_RATE;
                     }
-                } else {
-                    if (enemy_screen_y <= CENTER_LINE_Y + 4) {
-                        enemies[i].active = 0;
-                        move_sprite(enemies[i].sprite_id, 0, 0);
-                        if (lives > 0) {
-                            lives--;
-                            update_hud();
+
+                    // Bounce off screen edges
+                    if (enemy_screen_x < 8) {
+                        enemies[i].x = 8 << 8;
+                        enemies[i].vx = ZIGZAG_SPEED;
+                    } else if (enemy_screen_x > SCREEN_WIDTH - 8) {
+                        enemies[i].x = (SCREEN_WIDTH - 8) << 8;
+                        enemies[i].vx = -ZIGZAG_SPEED;
+                    }
+
+                    // Check if reached center line - stop on the line
+                    if (enemies[i].dir == DIR_DOWN) {
+                        if (enemy_screen_y >= CENTER_LINE_Y - 4) {
+                            enemies[i].y = (CENTER_LINE_Y - 4) << 8;
+                            enemies[i].vy = 0;
+                            enemies[i].vx = 0;
+                        }
+                    } else {
+                        if (enemy_screen_y <= CENTER_LINE_Y + 4) {
+                            enemies[i].y = (CENTER_LINE_Y + 4) << 8;
+                            enemies[i].vy = 0;
+                            enemies[i].vx = 0;
                         }
                     }
                 }
+                // When vy == 0, zigzag just sits on the line (no movement)
             } else if (enemies[i].type == ENEMY_ASTEROID) {
                 // Asteroid enemy - falls straight toward center line
                 enemies[i].y += enemies[i].vy << 8;
@@ -245,42 +260,42 @@ void update_enemies(void) {
                     move_sprite(enemies[i].sprite_id, 0, 0);
                 }
             } else {
-                // Normal enemy - moves vertically toward center line
-                enemies[i].y += enemies[i].vy << 8;
+                // Normal enemy - moves vertically toward center line, then patrols horizontally
+                if (enemies[i].vy != 0) {
+                    // Still approaching the center line
+                    enemies[i].y += enemies[i].vy << 8;
 
-                // Check if enemy reached center line (player loses life)
-                uint8_t enemy_screen_y = enemies[i].y >> 8;
+                    uint8_t enemy_screen_y = enemies[i].y >> 8;
 
-                if (enemies[i].dir == DIR_DOWN) {
-                    // Coming from top
-                    if (enemy_screen_y >= CENTER_LINE_Y - 4) {
-                        // Enemy hit the line!
-                        enemies[i].active = 0;
-                        move_sprite(enemies[i].sprite_id, 0, 0);
-
-                        if (lives > 0) {
-                            lives--;
-                            update_hud();
+                    if (enemies[i].dir == DIR_DOWN) {
+                        // Coming from top - when hits line, start moving right
+                        if (enemy_screen_y >= CENTER_LINE_Y - 4) {
+                            enemies[i].y = (CENTER_LINE_Y - 4) << 8;
+                            enemies[i].vy = 0;
+                            enemies[i].vx = ENEMY_SPEED_MIN;  // Start moving right
+                        }
+                    } else {
+                        // Coming from bottom - when hits line, start moving right
+                        if (enemy_screen_y <= CENTER_LINE_Y + 4) {
+                            enemies[i].y = (CENTER_LINE_Y + 4) << 8;
+                            enemies[i].vy = 0;
+                            enemies[i].vx = ENEMY_SPEED_MIN;  // Start moving right
                         }
                     }
                 } else {
-                    // Coming from bottom
-                    if (enemy_screen_y <= CENTER_LINE_Y + 4) {
-                        // Enemy hit the line!
-                        enemies[i].active = 0;
-                        move_sprite(enemies[i].sprite_id, 0, 0);
+                    // Patrolling the center line horizontally
+                    enemies[i].x += enemies[i].vx << 8;
 
-                        if (lives > 0) {
-                            lives--;
-                            update_hud();
-                        }
+                    uint8_t enemy_screen_x = enemies[i].x >> 8;
+
+                    // Bounce off screen edges
+                    if (enemy_screen_x < 8) {
+                        enemies[i].x = 8 << 8;
+                        enemies[i].vx = ENEMY_SPEED_MIN;  // Move right
+                    } else if (enemy_screen_x > SCREEN_WIDTH - 8) {
+                        enemies[i].x = (SCREEN_WIDTH - 8) << 8;
+                        enemies[i].vx = -ENEMY_SPEED_MIN;  // Move left
                     }
-                }
-
-                // Check if enemy went off screen (shouldn't happen normally)
-                if (enemy_screen_y > SCREEN_HEIGHT + 8) {
-                    enemies[i].active = 0;
-                    move_sprite(enemies[i].sprite_id, 0, 0);
                 }
             }
         }

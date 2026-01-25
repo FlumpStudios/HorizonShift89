@@ -8,7 +8,7 @@
 #define MAX_WAVES 10
 
 // --- Wave Configuration Structure ---
-// enemy_mask bits: 0=NORMAL, 1=SHOOTER, 2=ZIGZAG, 3=ASTEROID
+// enemy_mask bits: 0=NORMAL, 1=SHOOTER, 2=ZIGZAG, 3=ASTEROID, 4=DIVER
 typedef struct {
     uint8_t enemy_mask;   // Bitmask of allowed enemy types
     uint8_t spawn_rate;   // Frames between spawns

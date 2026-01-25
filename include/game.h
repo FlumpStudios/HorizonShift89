@@ -51,6 +51,7 @@
 #define TILE_ZIGZAG         6
 #define TILE_ASTEROID       7
 #define TILE_STAR           8
+#define TILE_DIVER          9
 
 // --- Starfield Constants ---
 #define NUM_STARS           20
@@ -70,11 +71,13 @@ typedef enum {
     ENEMY_NORMAL = 0,
     ENEMY_SHOOTER = 1,
     ENEMY_ZIGZAG = 2,
-    ENEMY_ASTEROID = 3
+    ENEMY_ASTEROID = 3,
+    ENEMY_DIVER = 4
 } EnemyType;
 
 // --- Game States ---
 typedef enum {
+    STATE_SPLASH,
     STATE_TITLE,
     STATE_COUNTDOWN,
     STATE_PLAYING,
@@ -125,6 +128,7 @@ extern uint8_t lives;
 extern uint8_t level;
 extern uint16_t frame_count;
 extern uint8_t center_line_state[CENTER_LINE_TILES];
+extern uint8_t controls_swapped;  // 0 = normal (A=jump, B=shoot), 1 = swapped
 
 // --- Function Prototypes ---
 // main.c

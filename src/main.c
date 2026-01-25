@@ -22,26 +22,124 @@ uint16_t frame_count;
 uint8_t spawn_timer;
 uint8_t prev_level;
 uint8_t countdown_timer;
+uint8_t controls_swapped;  // 0 = normal (A=jump, B=shoot), 1 = swapped
+uint8_t splash_timer;      // Timer for splash screen phases
+
+// --- Splash Screen ---
+void show_splash(void) {
+    // Splash screen phases:
+    // 0-30: fade in (white to normal)
+    // 31-120: hold
+    // 121-150: fade out (normal to white)
+
+    if (splash_timer == 0) {
+        // Initial setup - start with white screen
+        BGP_REG = 0xFF;  // All white
+        cls();
+        gotoxy(3, 8);
+        printf("Flump Studios");
+    }
+
+    splash_timer++;
+
+    // Fade in (frames 1-30)
+    if (splash_timer <= 10) {
+        BGP_REG = 0xFF;  // All white
+    } else if (splash_timer <= 20) {
+        BGP_REG = 0xFE;  // Slightly darker
+    } else if (splash_timer <= 30) {
+        BGP_REG = 0xF9;  // More contrast
+    } else if (splash_timer <= 40) {
+        BGP_REG = 0xE4;  // Normal palette
+    }
+    // Hold (frames 41-110)
+    else if (splash_timer <= 110) {
+        BGP_REG = 0xE4;  // Normal palette
+    }
+    // Fade out (frames 111-150)
+    else if (splash_timer <= 120) {
+        BGP_REG = 0xF9;
+    } else if (splash_timer <= 130) {
+        BGP_REG = 0xFE;
+    } else if (splash_timer <= 140) {
+        BGP_REG = 0xFF;  // All white
+    } else if (splash_timer >= 150) {
+        // Done - go to title
+        BGP_REG = 0xE4;  // Reset to normal
+        splash_timer = 0;
+        game_state = STATE_TITLE;
+    }
+}
 
 // --- Title Screen ---
 void show_title(void) {
-    cls();
-    printf("\n\n\n");
-    printf("   HORIZON SHIFT 89\n");
-    printf("\n");
-    printf("   ----------------\n");
-    printf("\n");
-    printf("   LEFT/RIGHT: Move\n");
-    printf("   UP/DOWN: Aim\n");
-    printf("   A: Jump\n");
-    printf("   B: Shoot\n");
-    printf("   Double-tap: Dash\n");
-    printf("\n");
-    printf("   Defend the line!\n");
-    printf("\n\n");
-    printf("   Press START");
+    uint8_t menu_selection = 0;  // 0 = Start, 1 = Switch controls
+    uint8_t joy, prev_joy_title = 0;
 
-    waitpad(J_START);
+    cls();
+    gotoxy(1, 3);
+    printf("Horizon Shift '89");
+    gotoxy(1, 5);
+    printf("-----------------");
+
+    // Draw menu options
+    gotoxy(1, 9);
+    printf("> Start");
+    gotoxy(1, 11);
+    printf("  Switch controls");
+
+    // Show current control scheme
+    gotoxy(3, 14);
+    if (controls_swapped) {
+        printf("A:Shoot  B:Jump");
+    } else {
+        printf("A:Jump   B:Shoot");
+    }
+
+    while(1) {
+        joy = joypad();
+        uint8_t joy_pressed = joy & ~prev_joy_title;
+
+        // Navigate menu
+        if (joy_pressed & J_UP) {
+            if (menu_selection > 0) {
+                menu_selection--;
+            }
+        }
+        if (joy_pressed & J_DOWN) {
+            if (menu_selection < 1) {
+                menu_selection++;
+            }
+        }
+
+        // Update cursor
+        gotoxy(1, 9);
+        printf(menu_selection == 0 ? ">" : " ");
+        gotoxy(1, 11);
+        printf(menu_selection == 1 ? ">" : " ");
+
+        // Select option
+        if ((joy_pressed & J_START) || (joy_pressed & J_A)) {
+            if (menu_selection == 0) {
+                // Start game
+                break;
+            } else {
+                // Toggle controls
+                controls_swapped = !controls_swapped;
+                // Update display
+                gotoxy(3, 14);
+                if (controls_swapped) {
+                    printf("A:Shoot  B:Jump");
+                } else {
+                    printf("A:Jump   B:Shoot");
+                }
+            }
+        }
+
+        prev_joy_title = joy;
+        wait_vbl_done();
+    }
+
     waitpadup();
 }
 
@@ -83,8 +181,8 @@ void init_game(void) {
     reset_center_line();
     init_wave_system();
 
-    // Load sprite data (9 tiles: player up/down, enemy, bullet, shooter, enemy bullet, zigzag, asteroid, star)
-    set_sprite_data(0, 9, sprite_data);
+    // Load sprite data (10 tiles: player up/down, enemy, bullet, shooter, enemy bullet, zigzag, asteroid, star, diver)
+    set_sprite_data(0, 10, sprite_data);
 
     // Set up sprite palettes
     OBP0_REG = 0xE4;  // Normal: black, dark gray, light gray, white
@@ -189,11 +287,20 @@ void main(void) {
     // Set up display
     DISPLAY_ON;
 
+    // Initialize controls
+    controls_swapped = 0;
+    splash_timer = 0;
+    game_state = STATE_SPLASH;
+
     enable_interrupts();
 
     // Main game loop
     while(1) {
         switch(game_state) {
+            case STATE_SPLASH:
+                show_splash();
+                break;
+
             case STATE_TITLE:
                 show_title();
                 // Seed random AFTER title screen - user timing adds entropy

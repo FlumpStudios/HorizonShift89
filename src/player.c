@@ -124,9 +124,15 @@ void update_player(void) {
         }
     }
 
-    // --- Jump (A button) ---
-    if ((joy_pressed & J_A) && !player.is_jumping) {
-        player_jump();
+    // --- Jump (A button normally, B if swapped) ---
+    if (controls_swapped) {
+        if ((joy_pressed & J_B) && !player.is_jumping) {
+            player_jump();
+        }
+    } else {
+        if ((joy_pressed & J_A) && !player.is_jumping) {
+            player_jump();
+        }
     }
 
     // --- Jump physics ---
@@ -193,10 +199,17 @@ void update_player(void) {
         }
     }
 
-    // --- Shooting (B button) ---
-    if ((joy & J_B) && player.shoot_cooldown == 0) {
-        player_shoot();
-        player.shoot_cooldown = 15;
+    // --- Shooting (B button normally, A if swapped) ---
+    if (controls_swapped) {
+        if ((joy & J_A) && player.shoot_cooldown == 0) {
+            player_shoot();
+            player.shoot_cooldown = 15;
+        }
+    } else {
+        if ((joy & J_B) && player.shoot_cooldown == 0) {
+            player_shoot();
+            player.shoot_cooldown = 15;
+        }
     }
 
     // --- Pause (Start button) ---

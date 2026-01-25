@@ -84,6 +84,29 @@ void spawn_enemy(void) {
 
                 // Set sprite tile for shooter
                 set_sprite_tile(enemies[i].sprite_id, TILE_SHOOTER);
+            } else if (enemy_type == ENEMY_DIVER) {
+                // Spawn diver enemy (descends, stops, fires at player, retreats)
+                enemies[i].type = ENEMY_DIVER;
+
+                // Random X position
+                enemies[i].x = ((rand() % (SCREEN_WIDTH - 16)) + 8) << 8;
+
+                // Randomly spawn from top or bottom
+                if (rand() & 1) {
+                    enemies[i].y = 0;
+                    enemies[i].dir = DIR_DOWN;
+                    enemies[i].vy = 2;  // Descend speed
+                } else {
+                    enemies[i].y = (SCREEN_HEIGHT) << 8;
+                    enemies[i].dir = DIR_UP;
+                    enemies[i].vy = -2;  // Ascend speed
+                }
+
+                enemies[i].vx = 0;
+                // shoot_timer used as state: 60=descending, then counts down while stopped
+                enemies[i].shoot_timer = 60;
+
+                set_sprite_tile(enemies[i].sprite_id, TILE_DIVER);
             } else if (enemy_type == ENEMY_ZIGZAG) {
                 // Spawn zigzag enemy
                 enemies[i].type = ENEMY_ZIGZAG;
@@ -228,6 +251,56 @@ void update_enemies(void) {
                     }
                 }
                 // When vy == 0, zigzag just sits on the line (no movement)
+            } else if (enemies[i].type == ENEMY_DIVER) {
+                // Diver enemy - descends, stops, fires at player, retreats
+                uint8_t enemy_screen_y = enemies[i].y >> 8;
+
+                if (enemies[i].shoot_timer == 60) {
+                    // Phase 1: Descending to stop position
+                    enemies[i].y += enemies[i].vy << 8;
+                    enemy_screen_y = enemies[i].y >> 8;
+
+                    // Stop at 1/3 of the way to center line
+                    if (enemies[i].dir == DIR_DOWN) {
+                        if (enemy_screen_y >= 30) {
+                            enemies[i].vy = 0;  // Stop
+                            enemies[i].shoot_timer = 59;  // Move to aiming phase
+                        }
+                    } else {
+                        if (enemy_screen_y <= SCREEN_HEIGHT - 30) {
+                            enemies[i].vy = 0;  // Stop
+                            enemies[i].shoot_timer = 59;  // Move to aiming phase
+                        }
+                    }
+                } else if (enemies[i].shoot_timer > 0) {
+                    // Phase 2: Stopped and aiming
+                    enemies[i].shoot_timer--;
+
+                    // Fire at player when timer hits 30
+                    if (enemies[i].shoot_timer == 30) {
+                        fire_enemy_bullet(enemies[i].x, enemies[i].y, enemies[i].dir);
+                    }
+
+                    // Start retreating when timer hits 0
+                    if (enemies[i].shoot_timer == 0) {
+                        // Reverse direction to leave
+                        if (enemies[i].dir == DIR_DOWN) {
+                            enemies[i].vy = -3;  // Retreat upward faster
+                        } else {
+                            enemies[i].vy = 3;  // Retreat downward faster
+                        }
+                    }
+                } else {
+                    // Phase 3: Retreating
+                    enemies[i].y += enemies[i].vy << 8;
+                    enemy_screen_y = enemies[i].y >> 8;
+
+                    // Check if off screen
+                    if (enemy_screen_y > SCREEN_HEIGHT + 8 || enemy_screen_y < 8) {
+                        enemies[i].active = 0;
+                        move_sprite(enemies[i].sprite_id, 0, 0);
+                    }
+                }
             } else if (enemies[i].type == ENEMY_ASTEROID) {
                 // Asteroid enemy - falls straight toward center line
                 enemies[i].y += enemies[i].vy << 8;

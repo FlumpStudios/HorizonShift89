@@ -50,6 +50,7 @@ void check_collisions(void) {
                 bullets[b].active = 0;
                 move_sprite(bullets[b].sprite_id, 0, 0);
 
+                trigger_explosion(enemies[e].x >> 8, enemies[e].y >> 8);
                 enemies[e].active = 0;
                 move_sprite(enemies[e].sprite_id, 0, 0);
 
@@ -100,6 +101,7 @@ void check_collisions(void) {
             if (lives > 0) {
                 lives--;
                 update_hud();
+                on_player_hit();
             }
         }
     }
@@ -139,6 +141,7 @@ void check_collisions(void) {
                 if (lives > 0) {
                     lives--;
                     update_hud();
+                    on_player_hit();
                 }
             }
         }
@@ -165,6 +168,7 @@ void check_collisions(void) {
                 kb_y + HITBOX_SIZE > enemy_y) {
 
                 // Knockback enemy hit a normal enemy - destroy both with 3x bonus
+                trigger_explosion(enemies[e].x >> 8, enemies[e].y >> 8);
                 enemies[e].active = 0;
                 move_sprite(enemies[e].sprite_id, 0, 0);
 

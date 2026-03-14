@@ -24,6 +24,7 @@ uint8_t prev_level;
 uint8_t countdown_timer;
 uint8_t controls_swapped;  // 0 = normal (A=jump, B=shoot), 1 = swapped
 uint8_t splash_timer;      // Timer for splash screen phases
+uint8_t player_hit_timer;  // Counts down after player is hit (death animation)
 
 // --- Splash Screen ---
 void show_splash(void) {
@@ -174,15 +175,17 @@ void init_game(void) {
     spawn_timer = 60;  // Spawn first enemy after 1 second
 
     // Initialize subsystems
+    player_hit_timer = 0;
     init_player();
     init_enemies();
     init_bullets();
     init_enemy_bullets();
+    init_explosions();
     reset_center_line();
     init_wave_system();
 
-    // Load sprite data (10 tiles: player up/down, enemy, bullet, shooter, enemy bullet, zigzag, asteroid, star, diver)
-    set_sprite_data(0, 10, sprite_data);
+    // Load sprite data (13 tiles: player up/down, enemy, bullet, shooter, enemy bullet, zigzag, asteroid, star, diver, explosion x3)
+    set_sprite_data(0, 13, sprite_data);
 
     // Set up sprite palettes
     OBP0_REG = 0xE4;  // Normal: black, dark gray, light gray, white
@@ -233,16 +236,36 @@ void clear_all_entities(void) {
 void update_game(void) {
     frame_count++;
 
-    // Spawn enemies periodically using wave spawn rate
-    spawn_timer--;
-    if (spawn_timer == 0) {
-        spawn_enemy();
-        // Get spawn rate from wave scripts
-        uint8_t wave_index = current_wave - 1;
-        if (wave_index >= MAX_WAVES) {
-            wave_index = MAX_WAVES - 1;
+    // Tick death animation and recover when it expires
+    if (player_hit_timer > 0) {
+        player_hit_timer--;
+        if (player_hit_timer == 0 && lives > 0) {
+            // Respawn player at center
+            player.x = SCREEN_WIDTH / 2;
+            player.y_offset = 0;
+            player.vy = 0;
+            player.is_jumping = 0;
+            player.is_dashing = 0;
+            player.facing = DIR_UP;
+            set_sprite_tile(player.sprite_id, TILE_PLAYER_UP);
+            clear_all_entities();
+            reset_center_line();
+            draw_center_line();
         }
-        spawn_timer = wave_scripts[wave_index].spawn_rate;
+    }
+
+    // Spawn enemies periodically (pause during death animation)
+    if (!player_hit_timer) {
+        spawn_timer--;
+        if (spawn_timer == 0) {
+            spawn_enemy();
+            // Get spawn rate from wave scripts
+            uint8_t wave_index = current_wave - 1;
+            if (wave_index >= MAX_WAVES) {
+                wave_index = MAX_WAVES - 1;
+            }
+            spawn_timer = wave_scripts[wave_index].spawn_rate;
+        }
     }
 
     // Update game entities
@@ -250,15 +273,18 @@ void update_game(void) {
     update_enemies();
     update_bullets();
     update_enemy_bullets();
+    update_explosions();
 
     // Update starfield twinkling
     update_starfield();
 
-    // Check for collisions
-    check_collisions();
+    // Check for collisions (skip during death animation)
+    if (!player_hit_timer) {
+        check_collisions();
+    }
 
-    // Check game over
-    if (lives == 0) {
+    // Check game over - delayed until death animation finishes
+    if (lives == 0 && player_hit_timer == 0) {
         game_state = STATE_GAMEOVER;
     }
 
@@ -277,6 +303,7 @@ void render_game(void) {
     render_enemies();
     render_bullets();
     render_enemy_bullets();
+    render_explosions();
 }
 
 // --- Main ---

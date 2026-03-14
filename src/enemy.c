@@ -313,6 +313,7 @@ void update_enemies(void) {
                     if (enemy_screen_y >= CENTER_LINE_Y - 4) {
                         // Asteroid hit the line - destroy sections (1-2 tiles radius)
                         destroy_center_line_section(enemy_screen_x, 1 + (rand() & 1));
+                        trigger_explosion(enemy_screen_x, enemy_screen_y);
                         enemies[i].active = 0;
                         move_sprite(enemies[i].sprite_id, 0, 0);
                         // No life lost from asteroid hitting line
@@ -321,6 +322,7 @@ void update_enemies(void) {
                     if (enemy_screen_y <= CENTER_LINE_Y + 4) {
                         // Asteroid hit the line - destroy sections
                         destroy_center_line_section(enemy_screen_x, 1 + (rand() & 1));
+                        trigger_explosion(enemy_screen_x, enemy_screen_y);
                         enemies[i].active = 0;
                         move_sprite(enemies[i].sprite_id, 0, 0);
                         // No life lost from asteroid hitting line

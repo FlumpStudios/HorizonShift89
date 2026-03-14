@@ -36,10 +36,11 @@
 #define KNOCKBACK_SPEED     6   // Speed enemies fly back when dash-killed
 
 // --- Sprite Constants ---
-#define SPRITE_PLAYER       0
-#define SPRITE_BULLET_START 1
-#define SPRITE_ENEMY_START  5       // Sprites 5-12 for enemies
+#define SPRITE_PLAYER             0
+#define SPRITE_BULLET_START       1
+#define SPRITE_ENEMY_START        5   // Sprites 5-12 for enemies
 #define SPRITE_ENEMY_BULLET_START 13  // Sprites 13-16 for enemy bullets
+#define SPRITE_EXPLOSION_START    17  // Sprites 17-18 for explosion pool
 
 // --- Tile Constants ---
 #define TILE_PLAYER_UP      0
@@ -52,6 +53,21 @@
 #define TILE_ASTEROID       7
 #define TILE_STAR           8
 #define TILE_DIVER          9
+#define TILE_EXPLOSION_0    10
+#define TILE_EXPLOSION_1    11
+#define TILE_EXPLOSION_2    12
+
+// --- Explosion Constants ---
+#define MAX_EXPLOSIONS          2
+#define EXPLOSION_FRAME_DURATION 5  // Game frames per animation frame (3 frames total)
+
+// --- Explosion Structure ---
+typedef struct {
+    uint8_t x;
+    uint8_t y;
+    uint8_t timer;   // Counts down from EXPLOSION_FRAME_DURATION * 3
+    uint8_t active;
+} Explosion;
 
 // --- Starfield Constants ---
 #define NUM_STARS           20
@@ -123,6 +139,8 @@ extern Player player;
 extern Entity enemies[MAX_ENEMIES];
 extern Entity bullets[MAX_BULLETS];
 extern Entity enemy_bullets[MAX_ENEMY_BULLETS];
+extern Explosion explosions[MAX_EXPLOSIONS];
+extern uint8_t player_hit_timer;  // Counts down after player is hit (death animation)
 extern uint16_t score;
 extern uint8_t lives;
 extern uint8_t level;
@@ -143,6 +161,7 @@ void render_player(void);
 void player_shoot(void);
 void player_jump(void);
 void player_dash(int8_t dir);
+void on_player_hit(void);
 
 // enemy.c
 void init_enemies(void);
@@ -172,6 +191,12 @@ void update_hud(void);
 void reset_center_line(void);
 void destroy_center_line_section(uint8_t x, uint8_t radius);
 uint8_t get_center_line_tile_at(uint8_t x);
+
+// explosion.c
+void init_explosions(void);
+void trigger_explosion(uint8_t x, uint8_t y);
+void update_explosions(void);
+void render_explosions(void);
 
 // starfield.c
 void init_starfield(void);

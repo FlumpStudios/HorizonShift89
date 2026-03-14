@@ -15,7 +15,8 @@
       "Bash(cmd //c:*)",
       "Bash(./build.bat)",
       "Bash(cmd /c build.bat)",
-      "Bash(cmd /c \"cd /d C:\\\\Projects\\\\GB\\\\HorizonShift89 && build.bat\")"
+      "Bash(cmd /c \"cd /d C:\\\\Projects\\\\GB\\\\HorizonShift89 && build.bat\")",
+      "Bash(cd C:/Projects/GB/HorizonShift89 && cmd /c \"build.bat 2>&1\" && echo BUILD_SUCCESS || echo BUILD_FAILED)"
     ]
   }
 }

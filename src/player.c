@@ -49,7 +49,21 @@ void player_dash(int8_t dir) {
     }
 }
 
+void on_player_hit(void) {
+    uint8_t px = player.x;
+    uint8_t py = CENTER_LINE_Y + player.y_offset;
+    trigger_explosion(px, py);
+    move_sprite(player.sprite_id, 0, 0);
+    player_hit_timer = 40;
+}
+
 void update_player(void) {
+    // Skip input during death animation
+    if (player_hit_timer > 0) {
+        prev_joy = joypad();  // Consume input to prevent button sticking on respawn
+        return;
+    }
+
     uint8_t joy = joypad();
     uint8_t joy_pressed = joy & ~prev_joy;  // Newly pressed buttons
 
@@ -234,6 +248,7 @@ void player_shoot(void) {
 }
 
 void render_player(void) {
+    if (player_hit_timer > 0) return;  // Hidden during death animation
     // Position sprite with y_offset for jumping
     // Offset based on facing so player sits on the line
     int8_t facing_offset = (player.facing == DIR_UP) ? -3 : 2;

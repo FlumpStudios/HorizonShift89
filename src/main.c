@@ -34,8 +34,8 @@ void show_splash(void) {
     // 121-150: fade out (normal to white)
 
     if (splash_timer == 0) {
-        // Initial setup - start with white screen
-        BGP_REG = 0xFF;  // All white
+        // Initial setup - start with black screen
+        BGP_REG = 0x00;  // All black
         cls();
         gotoxy(3, 8);
         printf("Flump Studios");
@@ -45,28 +45,28 @@ void show_splash(void) {
 
     // Fade in (frames 1-30)
     if (splash_timer <= 10) {
-        BGP_REG = 0xFF;  // All white
+        BGP_REG = 0x00;  // All black
     } else if (splash_timer <= 20) {
-        BGP_REG = 0xFE;  // Slightly darker
+        BGP_REG = 0x01;  // Slightly lighter
     } else if (splash_timer <= 30) {
-        BGP_REG = 0xF9;  // More contrast
+        BGP_REG = 0x06;  // More contrast
     } else if (splash_timer <= 40) {
-        BGP_REG = 0xE4;  // Normal palette
+        BGP_REG = 0x1B;  // Inverted palette
     }
     // Hold (frames 41-110)
     else if (splash_timer <= 110) {
-        BGP_REG = 0xE4;  // Normal palette
+        BGP_REG = 0x1B;  // Inverted palette
     }
     // Fade out (frames 111-150)
     else if (splash_timer <= 120) {
-        BGP_REG = 0xF9;
+        BGP_REG = 0x06;
     } else if (splash_timer <= 130) {
-        BGP_REG = 0xFE;
+        BGP_REG = 0x01;
     } else if (splash_timer <= 140) {
-        BGP_REG = 0xFF;  // All white
+        BGP_REG = 0x00;  // All black
     } else if (splash_timer >= 150) {
         // Done - go to title
-        BGP_REG = 0xE4;  // Reset to normal
+        BGP_REG = 0x1B;  // Reset to inverted
         splash_timer = 0;
         game_state = STATE_TITLE;
     }
@@ -188,8 +188,8 @@ void init_game(void) {
     set_sprite_data(0, 13, sprite_data);
 
     // Set up sprite palettes
-    OBP0_REG = 0xE4;  // Normal: black, dark gray, light gray, white
-    OBP1_REG = 0x90;  // Lighter (knockback): black, light gray, white, white
+    OBP0_REG = 0x1B;  // Inverted: white, light gray, dark gray, black
+    OBP1_REG = 0x6F;  // Inverted lighter (knockback): white, dark gray, black, black
 
     // Enable sprites
     SHOW_SPRITES;
